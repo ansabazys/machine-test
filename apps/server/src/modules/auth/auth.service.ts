@@ -66,54 +66,91 @@ export const verifyOtp = async (email: string, otp: string) => {
   return user;
 };
 
-export const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email });
+export const loginUser = async (
+  email: string,
+  password: string
+) => {
+  const user = await User.findOne({
+    email,
+  });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new Error(
+      "Invalid credentials"
+    );
   }
 
   // ACCOUNT LOCK CHECK
-  if (user.lockUntil && user.lockUntil > new Date()) {
-    throw new Error("Account temporarily locked. Try again later.");
+  if (
+    user.lockUntil &&
+    user.lockUntil > new Date()
+  ) {
+    throw new Error(
+      "Account temporarily locked. Try again later."
+    );
   }
 
-  if (!user.emailVerified) {
-    throw new Error("Please verify your email");
-  }
-
-  if (user.status !== "APPROVED") {
-    throw new Error("Your account is waiting for admin approval");
-  }
-
-  const isPasswordCorrect = await comparePassword(password, user.password);
+  // PASSWORD CHECK FIRST
+  const isPasswordCorrect =
+    await comparePassword(
+      password,
+      user.password
+    );
 
   // FAILED LOGIN HANDLING
   if (!isPasswordCorrect) {
     user.loginAttempts += 1;
 
-    // LOCK AFTER 5 ATTEMPTS
     if (user.loginAttempts >= 5) {
-      user.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+      user.lockUntil = new Date(
+        Date.now() +
+          15 * 60 * 1000
+      );
 
       user.loginAttempts = 0;
     }
 
     await user.save();
 
-    throw new Error("Invalid credentials");
+    throw new Error(
+      "Invalid credentials"
+    );
   }
 
-  // RESET AFTER SUCCESSFUL LOGIN
+  // RESET AFTER SUCCESS
   user.loginAttempts = 0;
 
   user.lockUntil = undefined;
 
-  const accessToken = generateAccessToken(user._id.toString(), user.role);
+  // EMAIL VERIFIED CHECK
+  if (!user.emailVerified) {
+    throw new Error(
+      "Please verify your email"
+    );
+  }
 
-  const refreshToken = generateRefreshToken(user._id.toString());
+  // ADMIN APPROVAL CHECK
+  if (
+    user.status !== "APPROVED"
+  ) {
+    throw new Error(
+      "Your account is waiting for admin approval"
+    );
+  }
 
-  user.refreshToken = refreshToken;
+  const accessToken =
+    generateAccessToken(
+      user._id.toString(),
+      user.role
+    );
+
+  const refreshToken =
+    generateRefreshToken(
+      user._id.toString()
+    );
+
+  user.refreshToken =
+    refreshToken;
 
   await user.save();
 

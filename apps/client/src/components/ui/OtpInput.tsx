@@ -108,7 +108,7 @@ const OtpInput = ({ length = 6, onComplete }: Props) => {
             text-center
             text-lg
             font-medium
-            text-white
+           
             outline-none
             transition-all
               focus:border-[#b8bec8]

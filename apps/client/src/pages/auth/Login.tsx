@@ -56,7 +56,7 @@ const Login = () => {
       }
 
       // ADMIN APPROVAL
-      if (message === "Waiting for admin approval") {
+      if (message === "Your account is waiting for admin approval") {
         navigate("/pending-approval");
 
         return;

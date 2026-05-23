@@ -44,3 +44,15 @@ export const logoutUser = async () => {
 
   return response.data;
 };
+
+export const resendOtp = async (
+  email: string
+) => {
+
+  const response = await api.post(
+    "/auth/resend-otp",
+    { email }
+  );
+
+  return response.data;
+};

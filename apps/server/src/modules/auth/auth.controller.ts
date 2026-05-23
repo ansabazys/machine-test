@@ -5,6 +5,7 @@ import {
   logoutUser,
   refreshAccessToken,
   registerUser,
+  resendOtp,
   verifyOtp,
 } from "./auth.service.js";
 
@@ -159,3 +160,29 @@ export const logout = async (
     });
   }
 };
+
+export const resendEmailOtp =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const { email } = req.body;
+
+      await resendOtp(email);
+
+      res.status(200).json({
+        success: true,
+        message:
+          "OTP resent successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong",
+      });
+    }
+  };

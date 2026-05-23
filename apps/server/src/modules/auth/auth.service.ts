@@ -192,3 +192,37 @@ export const refreshAccessToken =
     await user.save();
   }
 };
+
+export const resendOtp = async (
+  email: string
+) => {
+  const user = await User.findOne({
+    email,
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.emailVerified) {
+    throw new Error(
+      "Email already verified"
+    );
+  }
+
+  const otp = generateOtp();
+
+  const otpExpires = new Date(
+    Date.now() + 5 * 60 * 1000
+  );
+
+  user.otp = otp;
+
+  user.otpExpires = otpExpires;
+
+  await user.save();
+
+  await sendOtpEmail(email, otp);
+
+  return true;
+};

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 interface AuthRequest extends Request {
   userId?: string;
+  userRole?: string;
 }
 
 const authMiddleware = (
@@ -29,9 +30,11 @@ const authMiddleware = (
       process.env.JWT_SECRET as string
     ) as {
       userId: string;
+      role: string;
     };
 
     req.userId = decoded.userId;
+    req.userRole = decoded.role;
 
     next();
   } catch (error) {

@@ -1,5 +1,12 @@
 import User from "../../models/user.model.js";
 
+export const getAllUsersService =
+  async () => {
+    return User.find()
+      .select("-password -refreshToken -otp")
+      .sort({ createdAt: -1 });
+  };
+
 export const getPendingUsersService =
   async () => {
     return User.find({

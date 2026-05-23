@@ -53,7 +53,7 @@ const Login = () => {
         accessToken: response.accessToken,
       });
 
-      navigate("/dashboard");
+      navigate(response.user.role === "admin" ? "/admin" : "/dashboard");
     } catch (error: any) {
       const message = error?.response?.data?.message || "Invalid credentials";
 

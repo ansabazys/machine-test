@@ -2,9 +2,32 @@ import { Request, Response } from "express";
 
 import {
   approveUserService,
+  getAllUsersService,
   getPendingUsersService,
   rejectUserService,
 } from "./admin.service.js";
+
+export const getUsers =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const users =
+        await getAllUsersService();
+
+      res.status(200).json({
+        success: true,
+        data: users,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message:
+          "Something went wrong",
+      });
+    }
+  };
 
 export const getPendingUsers =
   async (

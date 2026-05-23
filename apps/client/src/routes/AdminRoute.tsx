@@ -1,15 +1,14 @@
 import { useEffect } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { restoreSession } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 
-interface Props {
+interface AdminRouteProps {
   children: React.ReactNode;
 }
 
-const ProtectedRoute = ({ children }: Props) => {
-  const location = useLocation();
+const AdminRoute = ({ children }: AdminRouteProps) => {
   const {
     isAuthenticated,
     isLoading,
@@ -27,9 +26,7 @@ const ProtectedRoute = ({ children }: Props) => {
     const restoreAuth = async () => {
       try {
         setLoading(true);
-
         const session = await restoreSession();
-
         setAuth(session);
       } catch {
         clearAuth();
@@ -43,7 +40,7 @@ const ProtectedRoute = ({ children }: Props) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-sm text-gray-600">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f8] text-sm text-[#6b7280]">
         Loading...
       </div>
     );
@@ -57,14 +54,11 @@ const ProtectedRoute = ({ children }: Props) => {
     return <Navigate to="/pending-approval" replace />;
   }
 
-  if (
-    location.pathname.startsWith("/dashboard") &&
-    user?.role === "admin"
-  ) {
-    return <Navigate to="/admin" replace />;
+  if (user?.role !== "admin") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
 };
 
-export default ProtectedRoute;
+export default AdminRoute;

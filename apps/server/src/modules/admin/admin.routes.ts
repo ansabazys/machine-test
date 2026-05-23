@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
   approveUser,
+  getUsers,
   getPendingUsers,
   rejectUser,
 } from "./admin.controller.js";
@@ -11,6 +12,13 @@ import roleMiddleware from "../../middlewares/role.middleware.js";
 const router = Router();
 
 router.get(
+  "/users",
+  authMiddleware,
+  roleMiddleware("ADMIN"),
+  getUsers,
+);
+
+router.get(
   "/pending-users",
   authMiddleware,
   roleMiddleware("ADMIN"),
@@ -18,10 +26,24 @@ router.get(
 );
 
 router.patch(
+  "/users/:id/approve",
+  authMiddleware,
+  roleMiddleware("ADMIN"),
+  approveUser,
+);
+
+router.patch(
   "/approve/:id",
   authMiddleware,
   roleMiddleware("ADMIN"),
   approveUser,
+);
+
+router.patch(
+  "/users/:id/reject",
+  authMiddleware,
+  roleMiddleware("ADMIN"),
+  rejectUser,
 );
 
 router.patch(

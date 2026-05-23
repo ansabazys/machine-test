@@ -1,143 +1,108 @@
 import { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Loader2 } from "lucide-react";
 
-import { registerUser } from "@/services/auth.service";
+import { loginUser } from "@/services/auth.service";
 
+import { setAccessToken } from "@/store/auth.store";
 
+import { loginSchema } from "@/lib/validations/auth.schema";
 
-import { registerSchema } from "@/lib/validations/auth.schema";
+import type { LoginFormData } from "@/lib/validations/auth.schema";
 
-import type {
-  RegisterFormData,
-} from "@/lib/validations/auth.schema";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 
-
-const Register = () => {
+const Login = () => {
   const navigate = useNavigate();
 
-  const [serverError, setServerError] =
-    useState("");
+  const [serverError, setServerError] = useState("");
 
   const {
     register,
     handleSubmit,
-    formState: {
-      errors,
-      isSubmitting,
-    },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
-
-  const onSubmit = async (
-    data: RegisterFormData
-  ) => {
+  const onSubmit = async (data: LoginFormData) => {
     try {
       setServerError("");
 
-      await registerUser({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      });
+      const response = await loginUser(data);
 
-      navigate("/verify-otp", {
-        state: {
-          email: data.email,
-        },
-      });
+      setAccessToken(response.accessToken);
 
+      navigate("/dashboard");
     } catch (error: any) {
-      setServerError(
-        error.response?.data?.message ||
-        "Something went wrong"
-      );
+      const message = error.response?.data?.message;
+
+      // EMAIL NOT VERIFIED
+      if (message === "Please verify your email") {
+        navigate("/verify-otp", {
+          state: {
+            email: data.email,
+          },
+        });
+
+        return;
+      }
+
+      // ADMIN APPROVAL
+      if (message === "Waiting for admin approval") {
+        navigate("/pending-approval");
+
+        return;
+      }
+
+      setServerError(message || "Invalid credentials");
     }
   };
 
-
   return (
-    <div className="min-h-screen  flex items-center justify-center px-4">
-
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#f7f7f8]">
       <div className="w-full max-w-md border border-[#e5e7eb] bg-white p-8">
-
         {/* HEADER */}
         <div className="mb-8">
-
           <p className="mb-3 text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b7280]">
             Authentication
           </p>
 
           <h1 className="text-2xl font-medium tracking-tight text-[#09090b]">
-            Create account
+            Welcome back
           </h1>
 
           <p className="mt-2 text-sm text-[#6b7280]">
-            Register to continue to dashboard
+            Login to continue to dashboard
           </p>
-
         </div>
 
-
         {/* FORM */}
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-5"
-        >
-
-          {/* NAME */}
-          <div>
-
-            <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
-              Full Name
-            </label>
-
-            <Input
-              placeholder="John Doe"
-              {...register("name")}
-            />
-
-            {errors.name && (
-              <p className="mt-2 text-xs text-red-500">
-                {errors.name.message}
-              </p>
-            )}
-
-          </div>
-
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* EMAIL */}
           <div>
-
             <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
               Email Address
             </label>
 
-            <Input
-              placeholder="john@example.com"
-              {...register("email")}
-            />
+            <Input placeholder="john@example.com" {...register("email")} />
 
             {errors.email && (
               <p className="mt-2 text-xs text-red-500">
                 {errors.email.message}
               </p>
             )}
-
           </div>
-
 
           {/* PASSWORD */}
           <div>
-
             <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
               Password
             </label>
@@ -153,31 +118,7 @@ const Register = () => {
                 {errors.password.message}
               </p>
             )}
-
           </div>
-
-
-          {/* CONFIRM PASSWORD */}
-          <div>
-
-            <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
-              Confirm Password
-            </label>
-
-            <Input
-              type="password"
-              placeholder="••••••••"
-              {...register("confirmPassword")}
-            />
-
-            {errors.confirmPassword && (
-              <p className="mt-2 text-xs text-red-500">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-
-          </div>
-
 
           {/* SERVER ERROR */}
           {serverError && (
@@ -186,51 +127,35 @@ const Register = () => {
             </div>
           )}
 
-
           {/* BUTTON */}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2"
-          >
-
+          <Button type="submit" disabled={isSubmitting} className="mt-2">
             {isSubmitting ? (
               <div className="flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
 
-                <span>Creating Account</span>
+                <span>Signing In</span>
               </div>
             ) : (
-              "Create Account"
+              "Login"
             )}
-
           </Button>
-
         </form>
-
 
         {/* FOOTER */}
         <div className="mt-8 border-t border-[#e5e7eb] pt-5">
-
           <p className="text-xs text-[#6b7280]">
-
-            Already have an account?{" "}
-
+            Don’t have an account?{" "}
             <Link
-              to="/login"
+              to="/register"
               className="text-[#09090b] transition-colors hover:text-black"
             >
-              Login
+              Create account
             </Link>
-
           </p>
-
         </div>
-
       </div>
-
     </div>
   );
 };
 
-export default Register;
+export default Login;

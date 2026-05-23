@@ -1,10 +1,7 @@
 import { api } from "@/api/axios";
+import type { LoginPayload, RegisterPayload, VerifyOtpPayload } from "@/types/auth.types";
 
-import {
-  LoginPayload,
-  RegisterPayload,
-  VerifyOtpPayload,
-} from "@/types/auth.types";
+
 
 
 export const registerUser = async (

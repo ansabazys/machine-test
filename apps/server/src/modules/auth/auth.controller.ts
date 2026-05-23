@@ -1,5 +1,14 @@
 import { Request, Response } from "express";
-import { registerUser, verifyOtp } from "./auth.service.js";
+import {
+  getCurrentUser,
+  loginUser,
+  registerUser,
+  verifyOtp,
+} from "./auth.service.js";
+
+interface AuthRequest extends Request {
+  userId?: string;
+}
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -16,16 +25,12 @@ export const register = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message:
-        error instanceof Error ? error.message : "Something went wrong",
+      message: error instanceof Error ? error.message : "Something went wrong",
     });
   }
 };
 
-export const verifyEmailOtp = async (
-  req: Request,
-  res: Response
-) => {
+export const verifyEmailOtp = async (req: Request, res: Response) => {
   try {
     const { email, otp } = req.body;
 
@@ -33,16 +38,64 @@ export const verifyEmailOtp = async (
 
     res.status(200).json({
       success: true,
-      message:
-        "Email verified successfully. Waiting for admin approval.",
+      message: "Email verified successfully. Waiting for admin approval.",
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Something went wrong",
+      message: error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    const data = await loginUser(email, password);
+
+    res.cookie("refreshToken", data.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+
+      data: {
+        accessToken: data.accessToken,
+
+        user: {
+          id: data.user._id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+          status: data.user.status,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};
+
+export const me = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await getCurrentUser(req.userId as string);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
     });
   }
 };

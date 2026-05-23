@@ -38,3 +38,35 @@ export const registerUser = async ({
 
   return user;
 };
+
+export const verifyOtp = async (
+  email: string,
+  otp: string
+) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.otp !== otp) {
+    throw new Error("Invalid OTP");
+  }
+
+  if (
+    !user.otpExpires ||
+    user.otpExpires < new Date()
+  ) {
+    throw new Error("OTP expired");
+  }
+
+  user.emailVerified = true;
+
+  user.otp = undefined;
+
+  user.otpExpires = undefined;
+
+  await user.save();
+
+  return user;
+};

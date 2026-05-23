@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { registerUser } from "./auth.service.js";
+import { registerUser, verifyOtp } from "./auth.service.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -18,6 +18,31 @@ export const register = async (req: Request, res: Response) => {
       success: false,
       message:
         error instanceof Error ? error.message : "Something went wrong",
+    });
+  }
+};
+
+export const verifyEmailOtp = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { email, otp } = req.body;
+
+    await verifyOtp(email, otp);
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Email verified successfully. Waiting for admin approval.",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
     });
   }
 };

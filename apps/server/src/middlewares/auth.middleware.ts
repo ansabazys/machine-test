@@ -1,7 +1,14 @@
-import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import {
+  NextFunction,
+  Request,
+  Response,
+} from "express";
 
-interface AuthRequest extends Request {
+import { verifyAccessToken }
+  from "../utils/jwt.js";
+
+interface AuthRequest
+  extends Request {
   userId?: string;
   userRole?: string;
 }
@@ -25,16 +32,14 @@ const authMiddleware = (
     const token =
       authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as {
-      userId: string;
-      role: string;
-    };
+    const decoded =
+      verifyAccessToken(token);
 
-    req.userId = decoded.userId;
-    req.userRole = decoded.role;
+    req.userId =
+      decoded.userId;
+
+    req.userRole =
+      decoded.role;
 
     next();
   } catch (error) {

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import {
   getCurrentUser,
   loginUser,
+  logoutUser,
+  refreshAccessToken,
   registerUser,
   verifyOtp,
 } from "./auth.service.js";
@@ -96,6 +98,64 @@ export const me = async (req: AuthRequest, res: Response) => {
     res.status(500).json({
       success: false,
       message: "Something went wrong",
+    });
+  }
+};
+
+export const refresh = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken;
+
+    const accessToken =
+      await refreshAccessToken(
+        refreshToken
+      );
+
+    res.status(200).json({
+      success: true,
+      accessToken,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
+    });
+  }
+};
+
+export const logout = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken;
+
+    await logoutUser(
+      refreshToken
+    );
+
+    res.clearCookie(
+      "refreshToken"
+    );
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Logged out successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message:
+        "Something went wrong",
     });
   }
 };

@@ -1,12 +1,17 @@
-import { NextFunction, Response } from "express";
+import {
+  NextFunction,
+  Request,
+  Response,
+} from "express";
 
-interface AuthRequest extends Request {
+interface AuthRequest
+  extends Request {
   userId?: string;
-  userRole?: string;
+  userRole?: "ADMIN" | "USER";
 }
 
 const roleMiddleware = (
-  role: string
+  role: "ADMIN" | "USER"
 ) => {
   return (
     req: AuthRequest,

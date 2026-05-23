@@ -1,7 +1,7 @@
 import User from "../../models/user.model.js";
 import generateOtp from "../../utils/generateOtp.js";
 import { comparePassword, hashPassword } from "../../utils/hash.js";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt.js";
 import sendOtpEmail from "../../utils/sendOtpEmail.js";
 
 interface RegisterPayload {
@@ -128,4 +128,67 @@ export const getCurrentUser = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
 
   return user;
+};
+
+
+export const refreshAccessToken =
+  async (
+    refreshToken: string
+  ) => {
+    if (!refreshToken) {
+      throw new Error(
+        "Refresh token missing"
+      );
+    }
+
+    const decoded =
+      verifyRefreshToken(
+        refreshToken
+      );
+
+    const user =
+      await User.findById(
+        decoded.userId
+      );
+
+    if (!user) {
+      throw new Error(
+        "User not found"
+      );
+    }
+
+    if (
+      user.refreshToken !==
+      refreshToken
+    ) {
+      throw new Error(
+        "Invalid refresh token"
+      );
+    }
+
+    const accessToken =
+      generateAccessToken(
+        user._id.toString(),
+        user.role
+      );
+
+    return accessToken;
+  };
+
+  export const logoutUser = async (
+  refreshToken: string
+) => {
+  if (!refreshToken) {
+    return;
+  }
+
+  const user = await User.findOne({
+    refreshToken,
+  });
+
+  if (user) {
+    user.refreshToken = undefined;
+
+    await user.save();
+  }
 };

@@ -1,19 +1,11 @@
 import { useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Loader2 } from "lucide-react";
-
 import { loginUser } from "@/services/auth.service";
-
-import { setAccessToken } from "@/store/auth.store";
-
+import { useAuthStore } from "@/store/auth.store"
 import { loginSchema } from "@/lib/validations/auth.schema";
-
 import type { LoginFormData } from "@/lib/validations/auth.schema";
 
 import Input from "@/components/ui/input";
@@ -21,6 +13,8 @@ import Button from "@/components/ui/button";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const [serverError, setServerError] = useState("");
 
@@ -38,13 +32,31 @@ const Login = () => {
 
       const response = await loginUser(data);
 
-      setAccessToken(response.accessToken);
+      if (response?.message === "Please verify your email") {
+        navigate("/verify-otp", {
+          state: {
+            email: data.email,
+          },
+        });
+
+        return;
+      }
+
+      if (response?.message === "Your account is waiting for admin approval") {
+        navigate("/pending-approval");
+
+        return;
+      }
+
+      setAuth({
+        user: response.user,
+        accessToken: response.accessToken,
+      });
 
       navigate("/dashboard");
     } catch (error: any) {
-      const message = error.response?.data?.message;
+      const message = error?.response?.data?.message || "Invalid credentials";
 
-      // EMAIL NOT VERIFIED
       if (message === "Please verify your email") {
         navigate("/verify-otp", {
           state: {
@@ -55,14 +67,13 @@ const Login = () => {
         return;
       }
 
-      // ADMIN APPROVAL
       if (message === "Your account is waiting for admin approval") {
         navigate("/pending-approval");
 
         return;
       }
 
-      setServerError(message || "Invalid credentials");
+      setServerError(message);
     }
   };
 

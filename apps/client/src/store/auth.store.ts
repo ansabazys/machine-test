@@ -1,13 +1,54 @@
-let accessToken: string | null = null;
+import { create } from "zustand";
 
-export const setAccessToken = (token: string) => {
-  accessToken = token;
-};
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: "admin" | "user";
+  isApproved: boolean;
+  isVerified: boolean;
+}
 
-export const getAccessToken = () => {
-  return accessToken;
-};
+interface AuthState {
+  user: User | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 
-export const clearAccessToken = () => {
-  accessToken = null;
-};
+  setAuth: (data: {
+    user: User;
+    accessToken: string;
+  }) => void;
+
+  clearAuth: () => void;
+
+  setLoading: (loading: boolean) => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  accessToken: null,
+  isAuthenticated: false,
+  isLoading: true,
+
+  setAuth: ({ user, accessToken }) =>
+    set({
+      user,
+      accessToken,
+      isAuthenticated: true,
+      isLoading: false,
+    }),
+
+  clearAuth: () =>
+    set({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      isLoading: false,
+    }),
+
+  setLoading: (loading) =>
+    set({
+      isLoading: loading,
+    }),
+}));

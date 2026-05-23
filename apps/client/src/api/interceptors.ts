@@ -1,17 +1,10 @@
 import { AxiosError } from "axios";
 
-import { api } from "./axios";
+import { api } from "@/api/axios";
+import { useAuthStore } from "@/store/auth.store";
 
-import {
-  clearAccessToken,
-  getAccessToken,
-  setAccessToken,
-} from "@/store/auth.store";
-
-
-// REQUEST INTERCEPTOR
 api.interceptors.request.use((config) => {
-  const token = getAccessToken();
+  const token = useAuthStore.getState().accessToken;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -20,37 +13,40 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-
-// RESPONSE INTERCEPTOR
 api.interceptors.response.use(
   (response) => response,
 
   async (error: AxiosError) => {
     const originalRequest = error.config as any;
 
-    // If access token expired
     if (
       error.response?.status === 401 &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/refresh")
     ) {
       originalRequest._retry = true;
 
       try {
-        // Refresh token request
         const response = await api.post("/auth/refresh");
 
         const newAccessToken = response.data.accessToken;
 
-        setAccessToken(newAccessToken);
+        const currentUser = useAuthStore.getState().user;
 
-        // Retry original request
+        if (currentUser) {
+          useAuthStore.getState().setAuth({
+            user: currentUser,
+            accessToken: newAccessToken,
+          });
+        }
+
         originalRequest.headers.Authorization =
           `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
 
       } catch (refreshError) {
-        clearAccessToken();
+        useAuthStore.getState().clearAuth();
 
         window.location.href = "/login";
 

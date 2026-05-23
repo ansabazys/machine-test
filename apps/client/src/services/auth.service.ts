@@ -1,8 +1,15 @@
 import { api } from "@/api/axios";
+import type { User } from "@/store/auth.store";
 import type { LoginPayload, RegisterPayload, VerifyOtpPayload } from "@/types/auth.types";
 
-
-
+const normalizeUser = (user: any): User => ({
+  _id: user._id || user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role?.toLowerCase() as User["role"],
+  isApproved: user.isApproved ?? user.status === "APPROVED",
+  isVerified: user.isVerified ?? user.emailVerified,
+});
 
 export const registerUser = async (
   data: RegisterPayload
@@ -24,7 +31,11 @@ export const loginUser = async (
     data
   );
 
-  return response.data;
+  return {
+    ...response.data,
+    accessToken: response.data.data.accessToken,
+    user: normalizeUser(response.data.data.user),
+  };
 };
 
 
@@ -55,4 +66,25 @@ export const resendOtp = async (
   );
 
   return response.data;
+};
+
+export const getCurrentUser = async () => {
+  const response = await api.get("/auth/me");
+  return normalizeUser(response.data.data);
+};
+
+export const restoreSession = async () => {
+  const refreshResponse = await api.post("/auth/refresh");
+  const accessToken = refreshResponse.data.accessToken;
+
+  const userResponse = await api.get("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return {
+    accessToken,
+    user: normalizeUser(userResponse.data.data),
+  };
 };

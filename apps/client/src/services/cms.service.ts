@@ -1,27 +1,16 @@
 import axios from "axios";
 
-const CMS_URL = "http://localhost:1337/api";
+const CMS_URL =
+  import.meta.env.VITE_STRAPI_URL;
+
+const cmsApi = axios.create({
+  baseURL: `${CMS_URL}/api`,
+});
 
 export const getHomepage = async () => {
-  const res = await axios.get(
-    `${CMS_URL}/homepage?populate=*`
+  const response = await cmsApi.get(
+    "/homepage?populate=*"
   );
 
-  return res.data;
-};
-
-export const getFaqs = async () => {
-  const res = await axios.get(
-    `${CMS_URL}/faqs`
-  );
-
-  return res.data;
-};
-
-export const getAnnouncements = async () => {
-  const res = await axios.get(
-    `${CMS_URL}/announcements`
-  );
-
-  return res.data;
+  return response.data.data;
 };

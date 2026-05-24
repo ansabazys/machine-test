@@ -11,9 +11,6 @@
     "title": {
       "type": "text"
     },
-    "subtitle": {
-      "type": "blocks"
-    },
     "heroImage": {
       "type": "media",
       "multiple": false,
@@ -35,6 +32,9 @@
     },
     "secondaryButtonLink": {
       "type": "string"
+    },
+    "subtitle": {
+      "type": "text"
     }
   },
   "config": {}

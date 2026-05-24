@@ -2,11 +2,8 @@ import { motion } from "framer-motion";
 
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  getHomepage,
-  getFaqs,
-  getAnnouncements,
-} from "@/services/cms.service";
+import { getHomepage } from "@/services/cms.service";
+
 import Navbar from "@/components/home/navbar";
 import HeroSection from "@/components/home/hero-section";
 import StatsSection from "@/components/home/stats-section";
@@ -17,39 +14,26 @@ import FAQSection from "@/components/home/faq-section";
 import Footer from "@/components/home/footer";
 import LoadingScreen from "@/components/home/loading-screen";
 
-
 const HomePage = () => {
   const {
     data: homepage,
-    isLoading: homepageLoading,
+    isLoading,
+    error,
   } = useQuery({
     queryKey: ["homepage"],
     queryFn: getHomepage,
   });
 
-  const {
-    data: faqs,
-    isLoading: faqsLoading,
-  } = useQuery({
-    queryKey: ["faqs"],
-    queryFn: getFaqs,
-  });
-
-  const {
-    data: announcements,
-    isLoading: announcementsLoading,
-  } = useQuery({
-    queryKey: ["announcements"],
-    queryFn: getAnnouncements,
-  });
-
-  const isLoading =
-    homepageLoading ||
-    faqsLoading ||
-    announcementsLoading;
-
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (error || !homepage) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Failed to load homepage
+      </div>
+    );
   }
 
   return (
@@ -61,19 +45,29 @@ const HomePage = () => {
     >
       <Navbar />
 
-      <HeroSection homepage={homepage} />
+      <HeroSection
+        hero={homepage.hero}
+      />
 
-      <StatsSection />
+      <StatsSection
+        stats={homepage.stats}
+      />
 
-      <FeaturesSection />
+      <FeaturesSection
+        features={homepage.features}
+      />
 
       <ActivityPanel />
 
       <AnnouncementsSection
-        announcements={announcements}
+        announcements={
+          homepage.announcements
+        }
       />
 
-      <FAQSection faqs={faqs} />
+      <FAQSection
+        faq={homepage.FAQ}
+      />
 
       <Footer />
     </motion.div>

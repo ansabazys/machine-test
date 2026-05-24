@@ -1,8 +1,13 @@
 interface Props {
-  announcements: any;
+  announcements?: {
+    id: number;
+    title: string;
+    description: string;
+    priority: string;
+  }[];
 }
 
-const AnnouncementsSection = ({ announcements }: Props) => {
+const AnnouncementsSection = ({ announcements = [] }: Props) => {
   return (
     <section className="border-b border-[#e5e7eb]">
       <div className="mx-auto max-w-7xl px-6 py-14">
@@ -13,7 +18,7 @@ const AnnouncementsSection = ({ announcements }: Props) => {
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
-          {announcements?.data?.map((item: any) => (
+          {announcements.map((item) => (
             <div key={item.id} className="border border-[#e5e7eb] bg-white p-5">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-[#09090b]">
@@ -26,7 +31,7 @@ const AnnouncementsSection = ({ announcements }: Props) => {
               </div>
 
               <p className="mt-4 text-sm leading-7 text-[#6b7280]">
-                {item.description?.[0]?.children?.[0]?.text}
+                {item.description}
               </p>
             </div>
           ))}

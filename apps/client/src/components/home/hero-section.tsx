@@ -2,40 +2,55 @@ import { ArrowRight } from "lucide-react";
 
 import { Link } from "react-router-dom";
 
+import type { Hero } from "@/types/cms";
+
 interface Props {
-  homepage: any;
+  hero: Hero;
 }
 
-const HeroSection = ({ homepage }: Props) => {
+const HeroSection = ({
+  hero,
+}: Props) => {
   return (
     <section className="border-b border-[#e5e7eb]">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-2">
         <div className="flex flex-col justify-center">
           <span className="mb-5 w-fit border border-[#e5e7eb] bg-white px-3 py-1 text-[10px] font-mono uppercase tracking-[0.25em] text-[#6b7280]">
-            Secure Approval Workflow
+            {hero?.badge}
           </span>
 
           <h1 className="max-w-2xl text-5xl font-semibold tracking-tight text-[#09090b]">
-            {homepage?.data?.title}
+            {hero?.title}
           </h1>
 
           <p className="mt-6 max-w-xl text-sm leading-7 text-[#4b5563]">
-            {homepage?.data?.subtitle?.[0]?.children?.[0]?.text}
+            {hero?.subtitle}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
-              to={homepage?.data?.ctaLink || "/register"}
+              to={
+                hero?.primaryButtonLink ||
+                "/register"
+              }
               className="flex items-center gap-2 border border-[#09090b] bg-[#09090b] px-5 py-3 text-xs font-mono uppercase tracking-widest text-white transition-opacity hover:opacity-90"
             >
-              {homepage?.data?.ctaText}
+              {hero?.primaryButtonText}
 
               <ArrowRight className="h-4 w-4" />
             </Link>
 
-            <button className="border border-[#e5e7eb] bg-white px-5 py-3 text-xs font-mono uppercase tracking-widest text-[#6b7280] transition-colors hover:bg-[#f3f4f6] hover:text-[#09090b]">
-              API Documentation
-            </button>
+            <Link
+              to={
+                hero?.secondaryButtonLink ||
+                "/docs"
+              }
+              className="border border-[#e5e7eb] bg-white px-5 py-3 text-xs font-mono uppercase tracking-widest text-[#6b7280] transition-colors hover:bg-[#f3f4f6] hover:text-[#09090b]"
+            >
+              {
+                hero?.secondaryButtonText
+              }
+            </Link>
           </div>
         </div>
 
@@ -74,7 +89,9 @@ const HeroSection = ({ homepage }: Props) => {
                 className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-[#f9fafb]"
               >
                 <div>
-                  <p className="text-sm font-medium text-[#18181b]">{item}</p>
+                  <p className="text-sm font-medium text-[#18181b]">
+                    {item}
+                  </p>
 
                   <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
                     May 23 • 14:22

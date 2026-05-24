@@ -15,10 +15,10 @@ export interface SharedAnnouncements extends Struct.ComponentSchema {
 export interface SharedFaq extends Struct.ComponentSchema {
   collectionName: 'components_shared_faqs';
   info: {
-    displayName: 'FAQ';
+    displayName: 'faq';
   };
   attributes: {
-    answer: Schema.Attribute.Blocks;
+    answer: Schema.Attribute.Text;
     question: Schema.Attribute.String;
   };
 }
@@ -47,7 +47,7 @@ export interface SharedHero extends Struct.ComponentSchema {
     primaryButtonText: Schema.Attribute.String;
     secondaryButtonLink: Schema.Attribute.String;
     secondaryButtonText: Schema.Attribute.String;
-    subtitle: Schema.Attribute.Blocks;
+    subtitle: Schema.Attribute.Text;
     title: Schema.Attribute.Text;
   };
 }

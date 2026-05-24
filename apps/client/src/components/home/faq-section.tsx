@@ -1,8 +1,25 @@
+import { useState } from "react";
+
+import { ChevronDown } from "lucide-react";
+
+import type { Faq } from "@/types/cms";
+
 interface Props {
-  faqs: any;
+  faq?: Faq[];
 }
 
-const FAQSection = ({ faqs }: Props) => {
+const FAQSection = ({
+  faq = [],
+}: Props) => {
+  const [openId, setOpenId] =
+    useState<number | null>(null);
+
+  const toggleFaq = (id: number) => {
+    setOpenId((prev) =>
+      prev === id ? null : id
+    );
+  };
+
   return (
     <section className="border-b border-[#e5e7eb]">
       <div className="mx-auto max-w-7xl px-6 py-14">
@@ -17,17 +34,50 @@ const FAQSection = ({ faqs }: Props) => {
         </div>
 
         <div className="space-y-4">
-          {faqs?.data?.map((faq: any) => (
-            <div key={faq.id} className="border border-[#e5e7eb] bg-white p-5">
-              <h3 className="text-sm font-medium text-[#09090b]">
-                {faq.question}
-              </h3>
+          {faq.map((item) => {
+            const isOpen =
+              openId === item.id;
 
-              <p className="mt-4 text-sm leading-7 text-[#6b7280]">
-                {faq.answer?.[0]?.children?.[0]?.text}
-              </p>
-            </div>
-          ))}
+            return (
+              <div
+                key={item.id}
+                className="overflow-hidden border border-[#e5e7eb] bg-white transition-all"
+              >
+                <button
+                  onClick={() =>
+                    toggleFaq(item.id)
+                  }
+                  className="flex w-full items-center justify-between p-5 text-left"
+                >
+                  <h3 className="text-sm font-medium text-[#09090b]">
+                    {item.question}
+                  </h3>
+
+                  <ChevronDown
+                    className={`h-4 w-4 text-[#6b7280] transition-transform duration-200 ${
+                      isOpen
+                        ? "rotate-180"
+                        : ""
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className={`grid transition-all duration-300 ${
+                    isOpen
+                      ? "grid-rows-[1fr]"
+                      : "grid-rows-[0fr]"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="px-5 pb-5 text-sm leading-7 text-[#6b7280]">
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -27,11 +27,6 @@ const adminNavItems: SidebarItem[] = [
     icon: Users,
   },
   {
-    label: "Pending Approvals",
-    path: "/admin/pending-approvals",
-    icon: ShieldCheck,
-  },
-  {
     label: "Profile",
     path: "/admin/profile",
     icon: UserRound,

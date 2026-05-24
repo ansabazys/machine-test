@@ -13,14 +13,33 @@ export const getUsers =
     res: Response
   ) => {
     try {
-      const users =
-        await getAllUsersService();
+      const {
+        status,
+        search,
+        sort,
+        page,
+        limit,
+      } = req.query;
+
+      const result =
+        await getAllUsersService({
+          status: status as string,
+          search: search as string,
+          sort: sort as string,
+          page: Number(page) || 1,
+          limit:
+            Number(limit) || 10,
+        });
 
       res.status(200).json({
         success: true,
-        data: users,
+        data: result.users,
+        pagination:
+          result.pagination,
       });
     } catch (error) {
+      console.log(error);
+
       res.status(500).json({
         success: false,
         message:
@@ -35,14 +54,28 @@ export const getPendingUsers =
     res: Response
   ) => {
     try {
-      const users =
-        await getPendingUsersService();
+      const {
+        page,
+        limit,
+      } = req.query;
+
+      const result =
+        await getPendingUsersService(
+          Number(page) || 1,
+          Number(limit) || 5
+        );
 
       res.status(200).json({
         success: true,
-        data: users,
+
+        data: result.users,
+
+        pagination:
+          result.pagination,
       });
     } catch (error) {
+      console.log(error);
+
       res.status(500).json({
         success: false,
         message:
@@ -60,7 +93,17 @@ export const approveUser =
       const { id } = req.params;
 
       const user =
-        await approveUserService(id as string);
+        await approveUserService(
+          id as string
+        );
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "User not found",
+        });
+      }
 
       res.status(200).json({
         success: true,
@@ -69,6 +112,8 @@ export const approveUser =
         data: user,
       });
     } catch (error) {
+      console.log(error);
+
       res.status(500).json({
         success: false,
         message:
@@ -86,7 +131,17 @@ export const rejectUser =
       const { id } = req.params;
 
       const user =
-        await rejectUserService(id as string);
+        await rejectUserService(
+          id as string
+        );
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "User not found",
+        });
+      }
 
       res.status(200).json({
         success: true,
@@ -95,6 +150,8 @@ export const rejectUser =
         data: user,
       });
     } catch (error) {
+      console.log(error);
+
       res.status(500).json({
         success: false,
         message:

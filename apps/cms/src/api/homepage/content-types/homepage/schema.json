@@ -11,27 +11,30 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
-      "type": "string"
+    "hero": {
+      "type": "component",
+      "component": "shared.hero",
+      "repeatable": false
     },
-    "subtitle": {
-      "type": "blocks"
+    "features": {
+      "type": "component",
+      "component": "shared.feature",
+      "repeatable": true
     },
-    "heroImage": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
+    "stats": {
+      "type": "component",
+      "component": "shared.stat",
+      "repeatable": true
     },
-    "ctaText": {
-      "type": "string"
+    "FAQ": {
+      "type": "component",
+      "component": "shared.faq",
+      "repeatable": true
     },
-    "ctaLink": {
-      "type": "string"
+    "announcements": {
+      "type": "component",
+      "component": "shared.announcements",
+      "repeatable": true
     }
   }
 }

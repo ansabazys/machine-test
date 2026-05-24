@@ -99,16 +99,6 @@ export const router = createBrowserRouter([
         element: <AdminDashboard />,
       },
       {
-        path: "pending-approvals",
-        element: (
-          <AdminDashboard
-            defaultFilter="pending"
-            title="Pending Approvals"
-            description="Review verified users waiting for admin approval."
-          />
-        ),
-      },
-      {
         path: "profile",
         element: <AdminProfile />,
       },

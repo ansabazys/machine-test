@@ -19,7 +19,7 @@ router.get(
 );
 
 router.get(
-  "/pending-users",
+  "/users/pending",
   authMiddleware,
   roleMiddleware("ADMIN"),
   getPendingUsers,

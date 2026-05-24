@@ -16,6 +16,8 @@ import AdminHome from "@/pages/admin/AdminHome";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProfile from "@/pages/admin/AdminProfile";
 import AdminSettings from "@/pages/admin/AdminSettings";
+import HomePage from "@/pages/home/HomePage";
+;
 
 export const router = createBrowserRouter([
   /*
@@ -26,7 +28,7 @@ export const router = createBrowserRouter([
 
   {
     path: "/",
-    element: <Navigate to="/login" replace />,
+    element: <HomePage />,
   },
 
   {

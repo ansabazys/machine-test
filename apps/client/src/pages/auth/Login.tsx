@@ -4,12 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { loginUser } from "@/services/auth.service";
-import { useAuthStore } from "@/store/auth.store"
+import { useAuthStore } from "@/store/auth.store";
 import { loginSchema } from "@/lib/validations/auth.schema";
 import type { LoginFormData } from "@/lib/validations/auth.schema";
 
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
+import Navbar from "@/components/home/navbar";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -78,94 +79,97 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#f7f7f8]">
-      <div className="w-full max-w-md border border-[#e5e7eb] bg-white p-8">
-        {/* HEADER */}
-        <div className="mb-8">
-          <p className="mb-3 text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b7280]">
-            Authentication
-          </p>
+    <>
+      <Navbar />
+      <div className="min-h-screen absolute w-full top-0 flex items-center justify-center px-4 bg-[#f7f7f8]">
+        <div className="w-full max-w-md border border-[#e5e7eb] bg-white p-8">
+          {/* HEADER */}
+          <div className="mb-8">
+            <p className="mb-3 text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b7280]">
+              Authentication
+            </p>
 
-          <h1 className="text-2xl font-medium tracking-tight text-[#09090b]">
-            Welcome back
-          </h1>
+            <h1 className="text-2xl font-medium tracking-tight text-[#09090b]">
+              Welcome back
+            </h1>
 
-          <p className="mt-2 text-sm text-[#6b7280]">
-            Login to continue to dashboard
-          </p>
-        </div>
-
-        {/* FORM */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* EMAIL */}
-          <div>
-            <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
-              Email Address
-            </label>
-
-            <Input placeholder="john@example.com" {...register("email")} />
-
-            {errors.email && (
-              <p className="mt-2 text-xs text-red-500">
-                {errors.email.message}
-              </p>
-            )}
+            <p className="mt-2 text-sm text-[#6b7280]">
+              Login to continue to dashboard
+            </p>
           </div>
 
-          {/* PASSWORD */}
-          <div>
-            <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
-              Password
-            </label>
+          {/* FORM */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* EMAIL */}
+            <div>
+              <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
+                Email Address
+              </label>
 
-            <Input
-              type="password"
-              placeholder="••••••••"
-              {...register("password")}
-            />
+              <Input placeholder="john@example.com" {...register("email")} />
 
-            {errors.password && (
-              <p className="mt-2 text-xs text-red-500">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          {/* SERVER ERROR */}
-          {serverError && (
-            <div className="border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-500">
-              {serverError}
+              {errors.email && (
+                <p className="mt-2 text-xs text-red-500">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
-          )}
 
-          {/* BUTTON */}
-          <Button type="submit" disabled={isSubmitting} className="mt-2">
-            {isSubmitting ? (
-              <div className="flex items-center justify-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
+            {/* PASSWORD */}
+            <div>
+              <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
+                Password
+              </label>
 
-                <span>Signing In</span>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                {...register("password")}
+              />
+
+              {errors.password && (
+                <p className="mt-2 text-xs text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* SERVER ERROR */}
+            {serverError && (
+              <div className="border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-500">
+                {serverError}
               </div>
-            ) : (
-              "Login"
             )}
-          </Button>
-        </form>
 
-        {/* FOOTER */}
-        <div className="mt-8 border-t border-[#e5e7eb] pt-5">
-          <p className="text-xs text-[#6b7280]">
-            Don’t have an account?{" "}
-            <Link
-              to="/register"
-              className="text-[#09090b] transition-colors hover:text-black"
-            >
-              Create account
-            </Link>
-          </p>
+            {/* BUTTON */}
+            <Button type="submit" disabled={isSubmitting} className="mt-2">
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+
+                  <span>Signing In</span>
+                </div>
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </form>
+
+          {/* FOOTER */}
+          <div className="mt-8 border-t border-[#e5e7eb] pt-5">
+            <p className="text-xs text-[#6b7280]">
+              Don’t have an account?{" "}
+              <Link
+                to="/register"
+                className="text-[#09090b] transition-colors hover:text-black"
+              >
+                Create account
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

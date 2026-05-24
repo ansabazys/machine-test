@@ -3,8 +3,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 export const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 
   withCredentials: true,
 });
@@ -15,12 +14,21 @@ api.interceptors.response.use(
 
   async (error) => {
     const message =
-      error?.response?.data
-        ?.message ||
+      error?.response?.data?.message ||
       "Something went wrong";
 
+    const requestUrl =
+      error?.config?.url || "";
+
+    // IGNORE REFRESH TOKEN ERRORS
+    const isRefreshTokenRequest =
+      requestUrl.includes("/refresh-token");
+
     // AVOID DUPLICATE TOASTS
-    if (!error.config?.silent) {
+    if (
+      !error.config?.silent &&
+      !isRefreshTokenRequest
+    ) {
       toast.error(message);
     }
 

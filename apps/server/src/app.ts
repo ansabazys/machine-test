@@ -30,8 +30,11 @@ app.use(
   swaggerUi.setup(swaggerSpec)
 );
 
-app.get("/", (_, res) => {
-  res.send("API Running");
+app.get("/health", (_, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server running",
+  });
 });
 
 app.use("/api", routes);

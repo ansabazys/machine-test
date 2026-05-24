@@ -1,4 +1,10 @@
-import { Check, X } from "lucide-react";
+import { useState } from "react";
+
+import { Check, Loader2, X } from "lucide-react";
+
+import { toast } from "sonner";
+
+import ConfirmModal from "@/components/ui/confirm-modal";
 
 import {
   approveUser,
@@ -37,21 +43,98 @@ const formatDate = (value?: string) => {
 };
 
 const AdminTable = ({ users, onRefresh }: Props) => {
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
+    null,
+  );
+
+  const [approveModalOpen, setApproveModalOpen] = useState(false);
+
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  // APPROVE USER
   const handleApprove = async (id: string) => {
-    await approveUser(id);
+    try {
+      setActionLoadingId(id);
 
-    onRefresh();
+      setActionType("approve");
+
+      toast.loading("Approving user...", {
+        id: "approve-user",
+      });
+
+      await approveUser(id);
+
+      toast.dismiss("approve-user");
+
+      toast.success("User approved successfully");
+
+      onRefresh();
+    } catch (error: any) {
+      toast.dismiss("approve-user");
+
+      toast.error(error?.response?.data?.message || "Failed to approve user");
+    } finally {
+      setActionLoadingId(null);
+
+      setActionType(null);
+    }
   };
 
+  // REJECT USER
   const handleReject = async (id: string) => {
-    await rejectUser(id);
+    try {
+      setActionLoadingId(id);
 
-    onRefresh();
+      setActionType("reject");
+
+      toast.loading("Rejecting user...", {
+        id: "reject-user",
+      });
+
+      await rejectUser(id);
+
+      toast.dismiss("reject-user");
+
+      toast.success("User rejected successfully");
+
+      onRefresh();
+    } catch (error: any) {
+      toast.dismiss("reject-user");
+
+      toast.error(error?.response?.data?.message || "Failed to reject user");
+    } finally {
+      setActionLoadingId(null);
+
+      setActionType(null);
+    }
   };
+
+  // EMPTY STATE
+  if (!users?.length) {
+    return (
+      <div className="border border-[#e5e7eb] bg-white p-10 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9ca3af]">
+          Empty State
+        </p>
+
+        <h3 className="mt-3 text-lg font-medium text-[#09090b]">
+          No users found
+        </h3>
+
+        <p className="mt-2 text-sm text-[#6b7280]">
+          There are currently no users available.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
-      {/* DESKTOP TABLE */}
+      {/* TABLE */}
       <section className="hidden overflow-hidden border border-[#e5e7eb] bg-white lg:block">
         <div className="w-full overflow-x-auto">
           {/* HEADER */}
@@ -64,7 +147,7 @@ const AdminTable = ({ users, onRefresh }: Props) => {
 
             <div>Verified</div>
 
-            <div>Approval</div>
+            <div>Status</div>
 
             <div>Created</div>
 
@@ -73,7 +156,7 @@ const AdminTable = ({ users, onRefresh }: Props) => {
 
           {/* BODY */}
           <div className="divide-y divide-[#e5e7eb] bg-[#f9fafb]">
-            {(users || []).map((user) => (
+            {users.map((user) => (
               <div
                 key={user._id}
                 className="grid w-full grid-cols-[1.2fr_1.6fr_0.7fr_1fr_1fr_1fr_1.2fr] items-center gap-4 px-5 py-3 text-sm transition-colors hover:bg-[#eef2f7]"
@@ -121,29 +204,52 @@ const AdminTable = ({ users, onRefresh }: Props) => {
                   </span>
                 </div>
 
-                {/* DATE */}
+                {/* CREATED */}
                 <div className="font-mono text-xs text-[#6b7280]">
                   {formatDate(user.createdAt)}
                 </div>
 
                 {/* ACTIONS */}
                 <div className="flex justify-end gap-2">
+                  {/* APPROVE */}
                   <button
                     type="button"
-                    disabled={user.status === "APPROVED"}
-                    onClick={() => handleApprove(user._id)}
-                    className="flex h-8 w-8 items-center justify-center border border-[#e5e7eb] bg-white text-[#16a34a] transition-colors hover:bg-[#f3f4f6] disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={
+                      user.status === "APPROVED" || actionLoadingId === user._id
+                    }
+                    onClick={() => {
+                      setSelectedUserId(user._id);
+
+                      setApproveModalOpen(true);
+                    }}
+                    className="flex h-9 w-9 items-center justify-center border border-[#16a34a]/30 bg-[#16a34a]/10 text-[#16a34a] transition-all hover:bg-[#16a34a]/20 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <Check className="h-4 w-4" />
+                    {actionLoadingId === user._id &&
+                    actionType === "approve" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
                   </button>
 
+                  {/* REJECT */}
                   <button
                     type="button"
-                    disabled={user.status === "REJECTED"}
-                    onClick={() => handleReject(user._id)}
-                    className="flex h-8 w-8 items-center justify-center border border-[#e5e7eb] bg-white text-[#dc2626] transition-colors hover:bg-[#f3f4f6] disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={
+                      user.status === "REJECTED" || actionLoadingId === user._id
+                    }
+                    onClick={() => {
+                      setSelectedUserId(user._id);
+
+                      setRejectModalOpen(true);
+                    }}
+                    className="flex h-9 w-9 items-center justify-center border border-[#dc2626]/30 bg-[#dc2626]/10 text-[#dc2626] transition-all hover:bg-[#dc2626]/20 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <X className="h-4 w-4" />
+                    {actionLoadingId === user._id && actionType === "reject" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -152,76 +258,51 @@ const AdminTable = ({ users, onRefresh }: Props) => {
         </div>
       </section>
 
-      {/* MOBILE CARDS */}
-      <div className="space-y-4 lg:hidden">
-        {(users || []).map((user) => (
-          <div key={user._id} className="border border-[#e5e7eb] bg-white p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-medium text-[#09090b]">{user.name}</p>
+      {/* APPROVE MODAL */}
+      <ConfirmModal
+        open={approveModalOpen}
+        title="Approve User"
+        description="Are you sure you want to approve this user?"
+        confirmText="Approve"
+        loading={actionType === "approve"}
+        onCancel={() => {
+          setApproveModalOpen(false);
 
-                <p className="mt-1 text-sm text-[#6b7280]">{user.email}</p>
-              </div>
+          setSelectedUserId(null);
+        }}
+        onConfirm={async () => {
+          if (!selectedUserId) return;
 
-              <span
-                className={`border px-2 py-1 font-mono text-[10px] uppercase tracking-widest ${getStatusClassName(
-                  user.status,
-                )}`}
-              >
-                {user.status}
-              </span>
-            </div>
+          await handleApprove(selectedUserId);
 
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
-                  Role
-                </p>
+          setApproveModalOpen(false);
 
-                <p className="mt-1 uppercase text-[#09090b]">{user.role}</p>
-              </div>
+          setSelectedUserId(null);
+        }}
+      />
 
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
-                  Verified
-                </p>
+      {/* REJECT MODAL */}
+      <ConfirmModal
+        open={rejectModalOpen}
+        title="Reject User"
+        description="Are you sure you want to reject this user?"
+        confirmText="Reject"
+        loading={actionType === "reject"}
+        onCancel={() => {
+          setRejectModalOpen(false);
 
-                <p className="mt-1 text-[#09090b]">
-                  {user.emailVerified ? "Yes" : "No"}
-                </p>
-              </div>
+          setSelectedUserId(null);
+        }}
+        onConfirm={async () => {
+          if (!selectedUserId) return;
 
-              <div className="col-span-2">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
-                  Created
-                </p>
+          await handleReject(selectedUserId);
 
-                <p className="mt-1 text-[#09090b]">
-                  {formatDate(user.createdAt)}
-                </p>
-              </div>
-            </div>
+          setRejectModalOpen(false);
 
-            <div className="mt-5 flex gap-2">
-              <button
-                onClick={() => handleApprove(user._id)}
-                disabled={user.status === "APPROVED"}
-                className="flex-1 border border-[#16a34a] px-4 py-2 text-sm text-[#16a34a] disabled:opacity-40"
-              >
-                Approve
-              </button>
-
-              <button
-                onClick={() => handleReject(user._id)}
-                disabled={user.status === "REJECTED"}
-                className="flex-1 border border-[#dc2626] px-4 py-2 text-sm text-[#dc2626] disabled:opacity-40"
-              >
-                Reject
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          setSelectedUserId(null);
+        }}
+      />
     </>
   );
 };

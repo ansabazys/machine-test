@@ -1,18 +1,19 @@
 import { useMemo, useState } from "react";
-import {
-  Home,
-  Settings,
-  ShieldCheck,
-  UserRound,
-  Users,
-} from "lucide-react";
+
+import { Home, Settings, UserRound, Users } from "lucide-react";
+
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+
+import { toast } from "sonner";
 
 import DashboardSidebar, {
   type SidebarItem,
 } from "@/components/dashboard/DashboardSidebar";
+
 import DashboardTopbar from "@/components/dashboard/DashboardTopbar";
+
 import { logoutUser } from "@/services/auth.service";
+
 import { useAuthStore } from "@/store/auth.store";
 
 const adminNavItems: SidebarItem[] = [
@@ -40,9 +41,14 @@ const adminNavItems: SidebarItem[] = [
 
 const AdminLayout = () => {
   const location = useLocation();
+
   const navigate = useNavigate();
+
   const { user, clearAuth } = useAuthStore();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const pageTitle = useMemo(() => {
     if (location.pathname.endsWith("/users")) {
@@ -65,12 +71,36 @@ const AdminLayout = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
+    if (logoutLoading) {
+      return;
+    }
+
     try {
+      setLogoutLoading(true);
+
+      toast.loading("Logging out...", {
+        id: "logout",
+      });
+
       await logoutUser();
-    } finally {
+
+      toast.dismiss("logout");
+
+      toast.success("Logged out successfully");
+
       clearAuth();
+
       localStorage.clear();
-      navigate("/login", { replace: true });
+
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (error: any) {
+      toast.dismiss("logout");
+
+      toast.error(error?.response?.data?.message || "Failed to logout");
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
@@ -83,13 +113,14 @@ const AdminLayout = () => {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         onLogout={handleLogout}
+        logoutLoading={logoutLoading}
       />
 
       <div className="flex h-full flex-col md:ml-64">
         <DashboardTopbar
           title={pageTitle}
-          userName={user?.name}
-          role={user?.role}
+          userName={user?.name || "Admin"}
+          role={user?.role || "ADMIN"}
           onMenuClick={() => setIsSidebarOpen(true)}
         />
 

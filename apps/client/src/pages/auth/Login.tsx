@@ -1,11 +1,19 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Loader2 } from "lucide-react";
+
+import { toast } from "sonner";
+
 import { loginUser } from "@/services/auth.service";
+
 import { useAuthStore } from "@/store/auth.store";
+
 import { loginSchema } from "@/lib/validations/auth.schema";
+
 import type { LoginFormData } from "@/lib/validations/auth.schema";
 
 import Input from "@/components/ui/input";
@@ -15,25 +23,49 @@ import Navbar from "@/components/home/navbar";
 const Login = () => {
   const navigate = useNavigate();
 
-  const setAuth = useAuthStore((state) => state.setAuth);
-
-  const [serverError, setServerError] = useState("");
+  const setAuth = useAuthStore(
+    (state) => state.setAuth
+  );
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: {
+      errors,
+      isSubmitting,
+    },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver:
+      zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (
+    data: LoginFormData
+  ) => {
     try {
-      setServerError("");
+      toast.loading(
+        "Signing in...",
+        {
+          id: "login",
+        }
+      );
 
-      const response = await loginUser(data);
+      const response =
+        await loginUser(data);
 
-      if (response?.message === "Please verify your email") {
+      toast.dismiss("login");
+
+      const message =
+        response?.message;
+
+      if (
+        message ===
+        "Please verify your email"
+      ) {
+        toast.warning(
+          "Please verify your email"
+        );
+
         navigate("/verify-otp", {
           state: {
             email: data.email,
@@ -43,22 +75,53 @@ const Login = () => {
         return;
       }
 
-      if (response?.message === "Your account is waiting for admin approval") {
-        navigate("/pending-approval");
+      if (
+        message ===
+        "Your account is waiting for admin approval"
+      ) {
+        toast.info(
+          "Waiting for admin approval"
+        );
+
+        navigate(
+          "/pending-approval"
+        );
 
         return;
       }
+
+      toast.success(
+        "Login successful"
+      );
 
       setAuth({
         user: response.user,
-        accessToken: response.accessToken,
+        accessToken:
+          response.accessToken,
       });
 
-      navigate(response.user.role === "admin" ? "/admin" : "/dashboard");
+      navigate(
+        response.user.role ===
+          "ADMIN"
+          ? "/admin"
+          : "/dashboard"
+      );
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Invalid credentials";
+      toast.dismiss("login");
 
-      if (message === "Please verify your email") {
+      const message =
+        error?.response?.data
+          ?.message ||
+        "Invalid credentials";
+
+      if (
+        message ===
+        "Please verify your email"
+      ) {
+        toast.warning(
+          "Email verification required"
+        );
+
         navigate("/verify-otp", {
           state: {
             email: data.email,
@@ -68,20 +131,30 @@ const Login = () => {
         return;
       }
 
-      if (message === "Your account is waiting for admin approval") {
-        navigate("/pending-approval");
+      if (
+        message ===
+        "Your account is waiting for admin approval"
+      ) {
+        toast.info(
+          "Your account is pending approval"
+        );
+
+        navigate(
+          "/pending-approval"
+        );
 
         return;
       }
 
-      setServerError(message);
+      toast.error(message);
     }
   };
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen absolute w-full top-0 flex items-center justify-center px-4 bg-[#f7f7f8]">
+
+      <div className="absolute top-0 flex min-h-screen w-full items-center justify-center bg-[#f7f7f8] px-4">
         <div className="w-full max-w-md border border-[#e5e7eb] bg-white p-8">
           {/* HEADER */}
           <div className="mb-8">
@@ -94,23 +167,35 @@ const Login = () => {
             </h1>
 
             <p className="mt-2 text-sm text-[#6b7280]">
-              Login to continue to dashboard
+              Login to continue to
+              dashboard
             </p>
           </div>
 
           {/* FORM */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            onSubmit={handleSubmit(
+              onSubmit
+            )}
+            className="space-y-5"
+          >
             {/* EMAIL */}
             <div>
               <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-[#6b7280]">
                 Email Address
               </label>
 
-              <Input placeholder="john@example.com" {...register("email")} />
+              <Input
+                placeholder="john@example.com"
+                {...register("email")}
+              />
 
               {errors.email && (
                 <p className="mt-2 text-xs text-red-500">
-                  {errors.email.message}
+                  {
+                    errors.email
+                      .message
+                  }
                 </p>
               )}
             </div>
@@ -124,30 +209,34 @@ const Login = () => {
               <Input
                 type="password"
                 placeholder="••••••••"
-                {...register("password")}
+                {...register(
+                  "password"
+                )}
               />
 
               {errors.password && (
                 <p className="mt-2 text-xs text-red-500">
-                  {errors.password.message}
+                  {
+                    errors.password
+                      .message
+                  }
                 </p>
               )}
             </div>
 
-            {/* SERVER ERROR */}
-            {serverError && (
-              <div className="border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-500">
-                {serverError}
-              </div>
-            )}
-
             {/* BUTTON */}
-            <Button type="submit" disabled={isSubmitting} className="mt-2">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="mt-2"
+            >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
 
-                  <span>Signing In</span>
+                  <span>
+                    Signing In
+                  </span>
                 </div>
               ) : (
                 "Login"
@@ -158,7 +247,8 @@ const Login = () => {
           {/* FOOTER */}
           <div className="mt-8 border-t border-[#e5e7eb] pt-5">
             <p className="text-xs text-[#6b7280]">
-              Don’t have an account?{" "}
+              Don’t have an
+              account?{" "}
               <Link
                 to="/register"
                 className="text-[#09090b] transition-colors hover:text-black"

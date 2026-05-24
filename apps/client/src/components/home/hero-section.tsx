@@ -8,9 +8,7 @@ interface Props {
   hero: Hero;
 }
 
-const HeroSection = ({
-  hero,
-}: Props) => {
+const HeroSection = ({ hero }: Props) => {
   return (
     <section className="border-b border-[#e5e7eb]">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-2">
@@ -29,10 +27,7 @@ const HeroSection = ({
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
-              to={
-                hero?.primaryButtonLink ||
-                "/register"
-              }
+              to={hero?.primaryButtonLink || "/register"}
               className="flex items-center gap-2 border border-[#09090b] bg-[#09090b] px-5 py-3 text-xs font-mono uppercase tracking-widest text-white transition-opacity hover:opacity-90"
             >
               {hero?.primaryButtonText}
@@ -41,15 +36,12 @@ const HeroSection = ({
             </Link>
 
             <Link
-              to={
-                hero?.secondaryButtonLink ||
-                "/docs"
-              }
+              to="http://localhost:5000/api-docs"
+              target="_blank"
+              rel="noopener noreferrer"
               className="border border-[#e5e7eb] bg-white px-5 py-3 text-xs font-mono uppercase tracking-widest text-[#6b7280] transition-colors hover:bg-[#f3f4f6] hover:text-[#09090b]"
             >
-              {
-                hero?.secondaryButtonText
-              }
+              {hero?.secondaryButtonText}
             </Link>
           </div>
         </div>
@@ -89,9 +81,7 @@ const HeroSection = ({
                 className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-[#f9fafb]"
               >
                 <div>
-                  <p className="text-sm font-medium text-[#18181b]">
-                    {item}
-                  </p>
+                  <p className="text-sm font-medium text-[#18181b]">{item}</p>
 
                   <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
                     May 23 • 14:22

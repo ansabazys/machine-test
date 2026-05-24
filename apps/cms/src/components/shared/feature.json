@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_features",
+  "info": {
+    "displayName": "feature"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "icon": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

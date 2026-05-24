@@ -47,8 +47,10 @@ export const registerUser = async ({
     otpExpires,
   });
 
-  // SEND EMAIL IN BACKGROUND
-  sendOtpEmail(email, otp).catch(console.error);
+  // IMPORTANT:
+  // KEEP AWAIT HERE
+  // Registration should guarantee OTP delivery
+  await sendOtpEmail(email, otp);
 
   return user;
 };
@@ -211,6 +213,7 @@ export const resendOtp = async (email: string) => {
   await user.save();
 
   // SEND EMAIL IN BACKGROUND
+  // Faster resend experience
   sendOtpEmail(email, otp).catch(console.error);
 
   return true;

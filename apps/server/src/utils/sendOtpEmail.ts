@@ -1,18 +1,43 @@
-import transporter from "../config/mail.js";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
-const sendOtpEmail = async (email: string, otp: string) => {
-  await transporter.sendMail({
-    // VERIFIED BREVO SENDER EMAIL
-    from: '"Machine Test" <ansab.devxtra@gmail.com>',
+const defaultClient =
+  SibApiV3Sdk.ApiClient
+    .instance;
 
-    to: email,
+const apiKey =
+  defaultClient.authentications[
+    "api-key"
+  ];
 
-    subject: "Verify Your Email Address",
+apiKey.apiKey =
+  process.env.BREVO_API_KEY!;
 
-    // FALLBACK FOR CLIENTS THAT BLOCK HTML
-    text: `Your OTP is ${otp}`,
+const apiInstance =
+  new SibApiV3Sdk
+    .TransactionalEmailsApi();
 
-    html: `
+const sendOtpEmail = async (
+  email: string,
+  otp: string
+) => {
+  await apiInstance.sendTransacEmail({
+    sender: {
+      email:
+        "ansab.devxtra@gmail.com",
+
+      name: "Machine Test",
+    },
+
+    to: [
+      {
+        email,
+      },
+    ],
+
+    subject:
+      "Verify Your Email Address",
+
+    htmlContent: `
       <div
         style="
           max-width: 600px;
@@ -28,7 +53,6 @@ const sendOtpEmail = async (email: string, otp: string) => {
             border-radius: 12px;
             padding: 40px 30px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
           "
         >
           <h1
@@ -81,41 +105,10 @@ const sendOtpEmail = async (email: string, otp: string) => {
             style="
               color: #64748b;
               font-size: 14px;
-              line-height: 1.6;
             "
           >
-            This OTP will expire in 5 minutes.
-          </p>
-
-          <p
-            style="
-              color: #64748b;
-              font-size: 14px;
-              line-height: 1.6;
-              margin-top: 24px;
-            "
-          >
-            If you did not request this email,
-            you can safely ignore it.
-          </p>
-
-          <hr
-            style="
-              margin: 32px 0;
-              border: none;
-              border-top: 1px solid #e2e8f0;
-            "
-          />
-
-          <p
-            style="
-              color: #94a3b8;
-              font-size: 12px;
-              text-align: center;
-              margin: 0;
-            "
-          >
-            © 2026 Machine Test Platform
+            This OTP will expire in
+            5 minutes.
           </p>
         </div>
       </div>

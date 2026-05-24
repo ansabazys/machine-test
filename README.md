@@ -14,13 +14,13 @@ https://machine-test-client.vercel.app
 
 ## Backend API
 
-https://your-backend-api.onrender.com
+https://machine-test-k1s4.onrender.com
 
 ---
 
 ## Swagger Documentation
 
-https://your-backend-api.onrender.com/api/docs
+https://machine-test-k1s4.onrender.com/api-docs
 
 ---
 
@@ -60,17 +60,11 @@ https://machine-test-cms.onrender.com/admin
 
 ---
 
-## Mobile Responsive View
-
-<!-- Add Screenshot -->
-![Mobile View](./screenshots/mobile.png)
-
----
 
 ## CMS Dashboard
 
 <!-- Add Screenshot -->
-![CMS](./screenshots/cms.png)
+![CMS](./screenshots/cms-dashboard.png)
 
 ---
 

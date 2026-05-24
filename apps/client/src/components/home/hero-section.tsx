@@ -36,7 +36,7 @@ const HeroSection = ({ hero }: Props) => {
             </Link>
 
             <Link
-              to="http://localhost:5000/api-docs"
+              to="https://machine-test-k1s4.onrender.com/api-docs"
               target="_blank"
               rel="noopener noreferrer"
               className="border border-[#e5e7eb] bg-white px-5 py-3 text-xs font-mono uppercase tracking-widest text-[#6b7280] transition-colors hover:bg-[#f3f4f6] hover:text-[#09090b]"

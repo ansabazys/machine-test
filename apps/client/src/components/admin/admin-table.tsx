@@ -134,7 +134,123 @@ const AdminTable = ({ users, onRefresh }: Props) => {
 
   return (
     <>
-      {/* TABLE */}
+      {/* MOBILE CARDS */}
+      <div className="space-y-4 lg:hidden">
+        {users.map((user) => (
+          <div key={user._id} className="border border-[#e5e7eb] bg-white p-4">
+            {/* TOP */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-[#09090b]">
+                  {user.name}
+                </p>
+
+                <p className="mt-1 truncate text-xs text-[#6b7280]">
+                  {user.email}
+                </p>
+
+                <p className="mt-2 truncate font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
+                  {user._id}
+                </p>
+              </div>
+
+              <span
+                className={`border px-2 py-1 font-mono text-[10px] uppercase tracking-widest ${getStatusClassName(
+                  user.status,
+                )}`}
+              >
+                {user.status}
+              </span>
+            </div>
+
+            {/* INFO */}
+            <div className="mt-5 space-y-3 border-t border-[#f3f4f6] pt-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
+                  Role
+                </span>
+
+                <span className="font-medium text-[#09090b]">{user.role}</span>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
+                  Verified
+                </span>
+
+                <span
+                  className={
+                    user.emailVerified ? "text-[#16a34a]" : "text-[#dc2626]"
+                  }
+                >
+                  {user.emailVerified ? "Verified" : "Unverified"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-[#9ca3af]">
+                  Created
+                </span>
+
+                <span className="text-[#6b7280]">
+                  {formatDate(user.createdAt)}
+                </span>
+              </div>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="mt-5 flex gap-2">
+              {/* APPROVE */}
+              <button
+                type="button"
+                disabled={
+                  user.status === "APPROVED" || actionLoadingId === user._id
+                }
+                onClick={() => {
+                  setSelectedUserId(user._id);
+
+                  setApproveModalOpen(true);
+                }}
+                className="flex flex-1 items-center justify-center gap-2 border border-[#16a34a]/30 bg-[#16a34a]/10 px-4 py-3 text-sm font-medium text-[#16a34a] transition-all hover:bg-[#16a34a]/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {actionLoadingId === user._id && actionType === "approve" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Approve
+                  </>
+                )}
+              </button>
+
+              {/* REJECT */}
+              <button
+                type="button"
+                disabled={
+                  user.status === "REJECTED" || actionLoadingId === user._id
+                }
+                onClick={() => {
+                  setSelectedUserId(user._id);
+
+                  setRejectModalOpen(true);
+                }}
+                className="flex flex-1 items-center justify-center gap-2 border border-[#dc2626]/30 bg-[#dc2626]/10 px-4 py-3 text-sm font-medium text-[#dc2626] transition-all hover:bg-[#dc2626]/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {actionLoadingId === user._id && actionType === "reject" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <X className="h-4 w-4" />
+                    Reject
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* DESKTOP TABLE */}
       <section className="hidden overflow-hidden border border-[#e5e7eb] bg-white lg:block">
         <div className="w-full overflow-x-auto">
           {/* HEADER */}

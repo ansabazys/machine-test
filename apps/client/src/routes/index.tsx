@@ -1,9 +1,6 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
-import Register from "@/pages/auth/Register";
-import VerifyOtp from "@/pages/auth/VerifyOtp";
-import Login from "@/pages/auth/Login";
-import PendingApproval from "@/pages/auth/PendingApproval";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import UserLayout from "@/layouts/UserLayout";
 import AdminLayout from "@/layouts/AdminLayout";
@@ -11,61 +8,97 @@ import AdminLayout from "@/layouts/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 
-import Dashboard from "@/pages/user/Dashboard";
-import UserProfile from "@/pages/user/Profile";
-import UserSettings from "@/pages/user/Settings";
 
-import AdminHome from "@/pages/admin/AdminHome";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminProfile from "@/pages/admin/AdminProfile";
-import AdminSettings from "@/pages/admin/AdminSettings";
+// =========================
+// Lazy Loaded Pages
+// =========================
 
-import HomePage from "@/pages/home/HomePage";
+const Register = lazy(() => import("@/pages/auth/Register"));
+const VerifyOtp = lazy(() => import("@/pages/auth/VerifyOtp"));
+const Login = lazy(() => import("@/pages/auth/Login"));
+const PendingApproval = lazy(() => import("@/pages/auth/PendingApproval"));
 
-import ErrorPage from "@/pages/error/ErrorPage";
+const Dashboard = lazy(() => import("@/pages/user/Dashboard"));
+const UserProfile = lazy(() => import("@/pages/user/Profile"));
+const UserSettings = lazy(() => import("@/pages/user/Settings"));
+
+const AdminHome = lazy(() => import("@/pages/admin/AdminHome"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const AdminProfile = lazy(() => import("@/pages/admin/AdminProfile"));
+const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
+
+const HomePage = lazy(() => import("@/pages/home/HomePage"));
+
+const ErrorPage = lazy(() => import("@/pages/error/ErrorPage"));
+
+
+// =========================
+// Suspense Wrapper
+// =========================
+
+const withSuspense = (component: React.ReactNode) => (
+  <Suspense
+    fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        Loading...
+      </div>
+    }
+  >
+    {component}
+  </Suspense>
+);
+
+
+// =========================
+// Router
+// =========================
 
 export const router = createBrowserRouter([
   
   {
     path: "/",
 
-    element: <HomePage />,
+    element: withSuspense(<HomePage />),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
   },
 
   {
     path: "/register",
 
-    element: <Register />,
+    element: withSuspense(<Register />),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
   },
 
   {
     path: "/verify-otp",
 
-    element: <VerifyOtp />,
+    element: withSuspense(<VerifyOtp />),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
   },
 
   {
     path: "/login",
 
-    element: <Login />,
+    element: withSuspense(<Login />),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
   },
 
   {
     path: "/pending-approval",
 
-    element: <PendingApproval />,
+    element: withSuspense(<PendingApproval />),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
   },
 
+
+  // =========================
+  // User Routes
+  // =========================
 
   {
     path: "/dashboard",
@@ -76,29 +109,33 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
 
     children: [
       {
         index: true,
 
-        element: <Dashboard />,
+        element: withSuspense(<Dashboard />),
       },
 
       {
         path: "profile",
 
-        element: <UserProfile />,
+        element: withSuspense(<UserProfile />),
       },
 
       {
         path: "settings",
 
-        element: <UserSettings />,
+        element: withSuspense(<UserSettings />),
       },
     ],
   },
 
+
+  // =========================
+  // Admin Routes
+  // =========================
 
   {
     path: "/admin",
@@ -109,36 +146,40 @@ export const router = createBrowserRouter([
       </AdminRoute>
     ),
 
-    errorElement: <ErrorPage />,
+    errorElement: withSuspense(<ErrorPage />),
 
     children: [
       {
         index: true,
 
-        element: <AdminHome />,
+        element: withSuspense(<AdminHome />),
       },
 
       {
         path: "users",
 
-        element: <AdminDashboard />,
+        element: withSuspense(<AdminDashboard />),
       },
 
       {
         path: "profile",
 
-        element: <AdminProfile />,
+        element: withSuspense(<AdminProfile />),
       },
 
       {
         path: "settings",
 
-        element: <AdminSettings />,
+        element: withSuspense(<AdminSettings />),
       },
     ],
   },
 
- 
+
+  // =========================
+  // Fallback Route
+  // =========================
+
   {
     path: "*",
 

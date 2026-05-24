@@ -68,13 +68,6 @@ https://machine-test-cms.onrender.com/admin
 
 ---
 
-## Swagger Documentation
-
-<!-- Add Screenshot -->
-![Swagger](./screenshots/swagger.png)
-
----
-
 # ✨ Features
 
 ## 🔐 Authentication System
@@ -170,8 +163,6 @@ apps
 ├── server    # Backend API (Render)
 └── cms       # Strapi CMS (Render)
 
-packages
-└── shared packages
 ```
 
 ---
@@ -265,8 +256,8 @@ pnpm develop
 ## Admin
 
 ```txt
-Email:
-Password:
+Email: admin@test.com
+Password: admin123
 ```
 
 ---
@@ -274,8 +265,8 @@ Password:
 ## User
 
 ```txt
-Email:
-Password:
+Email: user@test.com
+Password: user123
 ```
 
 ---

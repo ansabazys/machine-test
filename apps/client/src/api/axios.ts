@@ -20,14 +20,17 @@ api.interceptors.response.use(
     const requestUrl =
       error?.config?.url || "";
 
-    // IGNORE REFRESH TOKEN ERRORS
-    const isRefreshTokenRequest =
-      requestUrl.includes("/refresh-token");
+    // SILENTLY IGNORE REFRESH AUTH ERRORS
+    const isRefreshRequest =
+      requestUrl.includes("/refresh");
 
-    // AVOID DUPLICATE TOASTS
+    const isRefreshTokenMissing =
+      message === "Refresh token missing";
+
     if (
       !error.config?.silent &&
-      !isRefreshTokenRequest
+      !isRefreshRequest &&
+      !isRefreshTokenMissing
     ) {
       toast.error(message);
     }

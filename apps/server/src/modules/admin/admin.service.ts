@@ -16,7 +16,9 @@ export const getAllUsersService =
     page = 1,
     limit = 10,
   }: GetUsersParams) => {
-    const query: any = {};
+    const query: any = {
+      role: "USER"
+    };
 
     /* FILTER */
     if (status) {
